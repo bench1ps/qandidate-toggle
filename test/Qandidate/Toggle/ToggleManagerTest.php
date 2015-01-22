@@ -11,6 +11,7 @@
 
 namespace Qandidate\Toggle;
 
+use Psr\Log\NullLogger;
 use Qandidate\Toggle\ToggleCollection\InMemoryCollection;
 
 class ToggleManagerTest extends TestCase
@@ -20,7 +21,7 @@ class ToggleManagerTest extends TestCase
      */
     public function it_returns_false_if_toggle_not_added_to_manager_before()
     {
-        $manager = new ToggleManager(new InMemoryCollection());
+        $manager = new ToggleManager(new InMemoryCollection(), new NullLogger());
 
         $this->assertFalse($manager->active('foo', new Context()));
     }
@@ -30,7 +31,7 @@ class ToggleManagerTest extends TestCase
      */
     public function it_returns_the_value_of_the_toggle_if_available()
     {
-        $manager = new ToggleManager(new InMemoryCollection());
+        $manager = new ToggleManager(new InMemoryCollection(), new NullLogger());
         $manager->add($this->createToggleMock());
 
         $this->assertTrue($manager->active('some-feature', new Context()));
@@ -41,7 +42,7 @@ class ToggleManagerTest extends TestCase
      */
     public function it_updates_a_toggle()
     {
-        $manager = new ToggleManager(new InMemoryCollection());
+        $manager = new ToggleManager(new InMemoryCollection(), new NullLogger());
         $manager->add($this->createToggleMock());
         $manager->update($this->createToggleMock(false));
 
@@ -53,7 +54,7 @@ class ToggleManagerTest extends TestCase
      */
     public function it_removes_a_toggle()
     {
-        $manager = new ToggleManager(new InMemoryCollection());
+        $manager = new ToggleManager(new InMemoryCollection(), new NullLogger());
 
         $manager->add($this->createToggleMock());
 
@@ -69,7 +70,7 @@ class ToggleManagerTest extends TestCase
         $toggle     = new Toggle('some-feature',       array());
         $toggle2    = new Toggle('some-other-feature', array());
 
-        $manager = new ToggleManager(new InMemoryCollection());
+        $manager = new ToggleManager(new InMemoryCollection(), new NullLogger());
 
         $manager->add($toggle);
         $manager->add($toggle2);

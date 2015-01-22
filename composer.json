@@ -14,7 +14,8 @@
       }
     ],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3.2",
+        "psr/log": "1.0.0"
     },
     "require-dev": {
         "predis/predis": "~0.8",

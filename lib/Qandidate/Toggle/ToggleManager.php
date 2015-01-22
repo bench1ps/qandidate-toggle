@@ -11,19 +11,31 @@
 
 namespace Qandidate\Toggle;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * Manages the toggles of an application.
  */
 class ToggleManager
 {
+    /**
+     * @var ToggleCollection
+     */
     private $collection;
 
     /**
-     * @param ToggleCollection $collection
+     * @var LoggerInterface
      */
-    public function __construct(ToggleCollection $collection)
+    private $logger;
+
+    /**
+     * @param ToggleCollection $collection
+     * @param LoggerInterface  $logger
+     */
+    public function __construct(ToggleCollection $collection, LoggerInterface $logger)
     {
         $this->collection = $collection;
+        $this->logger = $logger;
     }
 
     /**
@@ -35,6 +47,11 @@ class ToggleManager
     public function active($name, Context $context)
     {
         if (null === $toggle = $this->collection->get($name)) {
+            $this->logger->notice(sprintf(
+                "Toggle %s does not exist in the toggle collection",
+                $name
+            ));
+
             return false;
         }
 
@@ -50,7 +67,16 @@ class ToggleManager
      */
     public function remove($name)
     {
-        return $this->collection->remove($name);
+        if ($this->collection->remove($name)) {
+            $this->logger->info(sprintf(
+                "Toggle %s was removed from the toggle collection",
+                $name
+            ));
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -61,6 +87,19 @@ class ToggleManager
     public function add(Toggle $toggle)
     {
         $this->collection->set($toggle->getName(), $toggle);
+        $this->logger->info(
+            sprintf(
+                "Toggle %s was added to the toggle collection",
+                $toggle->getName()
+            ),
+            [
+                'toggle' => [
+                    'name'       => $toggle->getName(),
+                    'status'     => $toggle->getStatus(),
+                    'conditions' => $toggle->getConditions()
+                ]
+            ]
+        );
     }
 
     /**
@@ -71,6 +110,19 @@ class ToggleManager
     public function update(Toggle $toggle)
     {
         $this->collection->set($toggle->getName(), $toggle);
+        $this->logger->info(
+            sprintf(
+                "Toggle %s was updated in the toggle collection",
+                $toggle->getName()
+            ),
+            [
+                'toggle' => [
+                    'name'       => $toggle->getName(),
+                    'status'     => $toggle->getStatus(),
+                    'conditions' => $toggle->getConditions()
+                ]
+            ]
+        );
     }
 
     /**
